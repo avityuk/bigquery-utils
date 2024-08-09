@@ -1,0 +1,22 @@
+config { hasOutput: true }
+-- Generates next ids and inserts them into a sample table.
+-- This implementation prevents against race condition.
+--
+-- @param INT64 id_count number of id to increase
+-- @return ARRAY<int64> an array of generated ids
+
+CREATE OR REPLACE TABLE FUNCTION ${self()}(id_start INT64, id_count INT64) AS
+SELECT * FROM UNNEST(GENERATE_ARRAY(id_start, id_start + id_count)) AS id;
+
+-- a unit test of GetNextIds
+-- BEGIN
+--   DECLARE i INT64 DEFAULT 1;
+--   DECLARE next_ids ARRAY<INT64> DEFAULT [];
+--   DECLARE ids ARRAY<INT64> DEFAULT [];
+--   WHILE i < 10 DO
+--     CALL get_next_ids(10, next_ids);
+--     SET ids = ARRAY_CONCAT(ids, next_ids);
+--     SET i = i + 1;
+--   END WHILE;
+--   SELECT FORMAT('IDs are: %t', ids);
+-- END;

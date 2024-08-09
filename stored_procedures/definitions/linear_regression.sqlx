@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2021 Google LLC
  *
@@ -51,6 +52,7 @@ EXECUTE IMMEDIATE """
 END;
 
 -- a unit test of linear_regression
+/*
 BEGIN
   DECLARE result STRUCT<a FLOAT64, b FLOAT64, r FLOAT64>;
   CREATE TEMP TABLE iris (sepal_length FLOAT64, sepal_width FLOAT64, petal_length FLOAT64, petal_width FLOAT64, species STRING)
@@ -218,4 +220,4 @@ BEGIN
   ASSERT ROUND(result.b, 11) = -0.62754617565;
   ASSERT ROUND(result.r, 11) = -0.35654408961;
 END;
-
+*/

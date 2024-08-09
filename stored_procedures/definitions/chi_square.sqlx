@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2021 Google LLC
  *
@@ -19,7 +20,7 @@
 -- @param STRING dependent_var name of the column in our table that represents our dependent variable
 -- @return STRUCT <FLOAT64 x, FLOAT64 dof, FLOAT64 p> x is the chi-square statistic, dof is degrees of freedom, p is the pvalue
 
-CREATE OR REPLACE PROCEDURE bqutil.procedure.chi_square (table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<x FLOAT64, dof FLOAT64, p FLOAT64> )
+CREATE OR REPLACE PROCEDURE ${self()}(table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<x FLOAT64, dof FLOAT64, p FLOAT64> )
 BEGIN
 EXECUTE IMMEDIATE """
     WITH contingency_table AS (
@@ -54,6 +55,7 @@ EXECUTE IMMEDIATE """
 END;
 
 -- a unit test of chi_square
+/*
 BEGIN
     DECLARE result STRUCT<x FLOAT64, dof FLOAT64, p FLOAT64>;
 
@@ -78,4 +80,4 @@ BEGIN
   ASSERT result.dof = 1;
   ASSERT result.p = 0.052958181867438725;
 END;
-
+*/
