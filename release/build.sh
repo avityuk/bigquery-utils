@@ -21,6 +21,7 @@ UDF_DIR=udfs
 # Directory of the Stored Procedures
 SP_DIR=stored_procedures
 
+export TERM=xterm-256color
 # Set colors if terminal supports it
 ncolors=$(tput colors)
 if [[ "${ncolors}" -gt 7 ]]; then
