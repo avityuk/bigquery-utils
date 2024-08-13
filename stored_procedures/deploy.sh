@@ -16,6 +16,8 @@
 
 
 DATASET_ID="procedure"
+# _BQ_LOCATION is an environment variable that is set in the Cloud Build trigger
+BQ_LOCATION=$_BQ_LOCATION
 
 if [[ -z "${PROJECT_ID}" ]]; then
   printf "You must set environment variable PROJECT_ID.\n"

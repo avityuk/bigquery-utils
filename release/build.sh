@@ -215,6 +215,12 @@ function build() {
     replace_js_udf_bucket_placeholder
     build_udfs
   fi
+  # Only build the BigQuery Stored Procedures if any files in the
+  # stored_procedures/ directory have been changed
+  if echo "${files_changed}" | grep -q "${SP_DIR}"/; then
+    printf "Building BigQuery stored procedures since the following files have changed:\n%s\n" "${files_changed}"
+    cd "${SP_DIR}" && ./deploy.sh
+  fi
 }
 
 #######################################
@@ -246,28 +252,6 @@ function deploy_udfs() {
     --substitutions SHORT_SHA=,_JS_BUCKET="${_JS_BUCKET}",_BQ_LOCATION="${_BQ_LOCATION}"
 }
 
-##############################################
-# Deploys Stored Procedures to the
-# US multi-region "procedure" bqutil dataset.
-# Globals:
-#   _BQ_LOCATION
-# Arguments:
-#   None
-# Returns:
-#   None
-##############################################
-function deploy_stored_procs() {
-  if [[ "${_BQ_LOCATION^^}" == "US" ]]; then
-    local sql_files=$(find $SP_DIR -type f -name "*.sql")
-    local num_files=$(echo "$sql_files" | wc -l)
-
-    printf "Creating or updating $num_files stored procedures...\n"
-    while read -r file; do
-      execute_query $file false "procedure"
-    done <<< "$sql_files"
-  fi
-}
-
 #######################################
 # Main entry-point for execution
 # Globals:
@@ -284,7 +268,9 @@ function main() {
   # and this is now building a commit on master branch.
   if [[ "${BRANCH_NAME}" == "master" && -z "${_PR_NUMBER}" ]]; then
     deploy_udfs
-    deploy_stored_procs
+    # For prod deploys of stored procedures, do not set SHORT_SHA so that BQ dataset
+    # names do not get the SHORT_SHA value added as a suffix.
+    cd "${SP_DIR}" && export SHORT_SHA="" && ./deploy.sh
   else
     build
     dry_run_all_sql
